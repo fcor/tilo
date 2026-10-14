@@ -1,16 +1,16 @@
-// Draws one shape from a genome, centered at the origin.
+// Draws one bloom from a seed, centered at the origin.
 // `size` is the canvas size in pixels, `t` is the time in seconds.
-// This is where genes (0–1) are mapped to visual values.
+// This is where traits (0–1) are mapped to visual values.
 
-const PULSE_SPEED = 2 // radians per second, shared by every shape so they dance in sync
+const PULSE_SPEED = 2 // radians per second, shared by every bloom so they dance in sync
 
-export function drawShape(p, genome, size, t) {
-  const sides = Math.round(p.lerp(3, 8, genome.sides))
-  const copies = Math.round(p.lerp(1, 6, genome.copies))
-  const radius = size * p.lerp(0.15, 0.4, genome.size)
-  const hue = genome.hue * 360
-  const spin = p.lerp(-1.5, 1.5, genome.spin) // radians per second; negative spins the other way
-  const pulse = p.lerp(0, 0.35, genome.pulse)
+export function drawBloom(p, seed, size, t) {
+  const sides = Math.round(p.lerp(3, 8, seed.sides))
+  const copies = Math.round(p.lerp(1, 6, seed.copies))
+  const radius = size * p.lerp(0.15, 0.4, seed.size)
+  const hue = seed.hue * 360
+  const spin = p.lerp(-1.5, 1.5, seed.spin) // radians per second; negative spins the other way
+  const pulse = p.lerp(0, 0.35, seed.pulse)
 
   const scale = 1 + pulse * Math.sin(t * PULSE_SPEED)
 

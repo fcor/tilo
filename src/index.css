@@ -12,18 +12,41 @@ body {
 
 .app {
   display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+/* Lineage: a horizontal strip of ancestors, oldest on the left. */
+.lineage {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px; /* room for the outlines */
+}
+
+.lineage .bloom-canvas {
+  flex: 0 0 64px;
+  width: 64px;
+}
+
+.lineage .bloom-canvas.current {
+  outline: 2px solid #eee;
+}
+
+.garden {
+  display: flex;
   flex-wrap: wrap;
   gap: 24px;
   align-items: flex-start;
   justify-content: center;
-  padding: 24px;
 }
 
 .parent {
   width: min(480px, 100%);
 }
 
-.children {
+.seedlings {
   width: min(480px, 100%);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -31,25 +54,25 @@ body {
 }
 
 /* Square box; the p5 canvas fills it exactly. */
-.shape-canvas {
+.bloom-canvas {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 8px;
 }
 
-.shape-canvas canvas {
+.bloom-canvas canvas {
   position: absolute;
   inset: 0;
   display: block;
 }
 
-.shape-canvas.clickable {
+.bloom-canvas.clickable {
   cursor: pointer;
   outline: 2px solid transparent;
   transition: outline-color 0.15s;
 }
 
-.shape-canvas.clickable:hover {
+.bloom-canvas.clickable:hover {
   outline-color: #888;
 }

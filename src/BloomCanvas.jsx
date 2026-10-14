@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react'
 import p5 from 'p5'
-import { drawShape } from './drawShape.js'
+import { drawBloom } from './drawBloom.js'
 
-// One p5 instance per shape. The instance is created once on mount;
-// genome changes are picked up through a ref that the draw loop reads.
-export default function ShapeCanvas({ genome, onClick }) {
+// One p5 instance per bloom. The instance is created once on mount;
+// seed changes are picked up through a ref that the draw loop reads.
+export default function BloomCanvas({ seed, onClick, className = '' }) {
   const containerRef = useRef(null)
-  const genomeRef = useRef(genome)
-  genomeRef.current = genome
+  const seedRef = useRef(seed)
+  seedRef.current = seed
 
   useEffect(() => {
     const container = containerRef.current
@@ -23,7 +23,7 @@ export default function ShapeCanvas({ genome, onClick }) {
         const t = performance.now() / 1000
         p.background(0, 0, 12)
         p.translate(p.width / 2, p.height / 2)
-        drawShape(p, genomeRef.current, Math.min(p.width, p.height), t)
+        drawBloom(p, seedRef.current, Math.min(p.width, p.height), t)
       }
     }
 
@@ -43,7 +43,7 @@ export default function ShapeCanvas({ genome, onClick }) {
   return (
     <div
       ref={containerRef}
-      className={onClick ? 'shape-canvas clickable' : 'shape-canvas'}
+      className={['bloom-canvas', onClick && 'clickable', className].filter(Boolean).join(' ')}
       onClick={onClick}
     />
   )
