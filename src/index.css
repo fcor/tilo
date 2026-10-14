@@ -1,0 +1,55 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #111;
+  color: #eee;
+  font-family: system-ui, sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+}
+
+.parent {
+  width: min(480px, 100%);
+}
+
+.children {
+  width: min(480px, 100%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+/* Square box; the p5 canvas fills it exactly. */
+.shape-canvas {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.shape-canvas canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.shape-canvas.clickable {
+  cursor: pointer;
+  outline: 2px solid transparent;
+  transition: outline-color 0.15s;
+}
+
+.shape-canvas.clickable:hover {
+  outline-color: #888;
+}
