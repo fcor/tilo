@@ -12,15 +12,16 @@ Items marked **❓** have open questions to think through before building them.
 - [x] All blooms animate in sync (chorus line)
 - [x] Seedlings are sprouted from the clicked bloom, not generated at random
 - [x] Linear lineage strip; click an ancestor to go back
+- [x] Lineage stored as a tree: nothing is ever deleted; returning to a bloom restores its seedlings
+- [x] Growing-tree view in a left sidebar: root at the bottom, every branch visible and clickable
+- [x] Re-sprout button: a fresh set of 9 seedlings from the same parent
+- [x] Still thumbnails in the lineage tree, drawn once by a single shared p5 instance
 - [x] Botanical naming (seed, trait, bloom, parent, seedlings, sprout, lineage)
 - [x] README, roadmap, design direction, decision log
 
 ## Now
 
-- [ ] **Lineage as a tree.** Store every pick as `{ id, seed, parentId }` and keep a `currentId` pointer. Going back never deletes anything; picking from an older bloom starts a new branch. This also makes every action reversible, which today it isn't.
-- [ ] **Growing-tree view.** Draw the lineage as a plant: the first seed is the root at the bottom and branches grow upward. Click any node to make it the parent and keep exploring from there.
-- [ ] **Re-sprout button.** Get a fresh set of 9 seedlings from the same parent, for when none of them are interesting.
-- [ ] **Still thumbnails.** Lineage nodes draw once (or animate on hover) instead of each running its own p5 loop, so big trees stay fast.
+- [ ] **Garden layout with the sidebar.** At around 1200px wide the seedling grid wraps below the parent instead of sitting beside it: the 240px tree sidebar plus the parent and grid (480px each + gap) need about 1000px. That pushes the seedlings below the fold on many laptops and breaks the side-by-side chorus line. Let the parent and grid shrink to fit side by side before wrapping. Also check the grid now starts lower than the parent because of the re-sprout button's row.
 
 ## Next: evolving something meaningful
 

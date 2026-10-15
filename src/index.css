@@ -12,29 +12,64 @@ body {
 
 .app {
   display: flex;
-  flex-direction: column;
   gap: 24px;
   padding: 24px;
+  height: 100vh;
 }
 
-/* Lineage: a horizontal strip of ancestors, oldest on the left. */
+/* Lineage: a tree that grows upward from the first seed, in its own scroll area. */
 .lineage {
+  flex: 0 0 240px;
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
+  overflow: auto;
   padding: 4px; /* room for the outlines */
 }
 
-.lineage .bloom-canvas {
-  flex: 0 0 64px;
-  width: 64px;
+/* Auto margins push a small tree to the bottom center without hiding overflow. */
+.tree {
+  position: relative;
+  flex: none;
+  margin: auto auto 0;
+}
+
+.tree-stems {
+  position: absolute;
+  inset: 0;
+}
+
+.tree-stems path {
+  fill: none;
+  stroke: #333;
+  stroke-width: 2;
+}
+
+.tree-stems path.on-stem {
+  stroke: #888;
+}
+
+.tree-node {
+  position: absolute;
+  width: 48px;
+  transform: translate(-50%, -50%);
 }
 
 .lineage .bloom-canvas.current {
   outline: 2px solid #eee;
 }
 
+/* Blooms off the path to the current one: kept, dimmed, still clickable. */
+.lineage .bloom-canvas.off-stem {
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+
+.lineage .bloom-canvas.off-stem:hover {
+  opacity: 1;
+}
+
 .garden {
+  flex: 1;
+  overflow: auto;
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
@@ -48,9 +83,40 @@ body {
 
 .seedlings {
   width: min(480px, 100%);
+}
+
+.seedlings-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.seedlings-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #888;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.icon-button:hover {
+  color: #eee;
+  background: #222;
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid #888;
 }
 
 /* Square box; the p5 canvas fills it exactly. */
@@ -61,7 +127,10 @@ body {
   border-radius: 8px;
 }
 
-.bloom-canvas canvas {
+.bloom-canvas canvas,
+.bloom-canvas img {
+  width: 100%;
+  height: 100%;
   position: absolute;
   inset: 0;
   display: block;
@@ -75,4 +144,22 @@ body {
 
 .bloom-canvas.clickable:hover {
   outline-color: #888;
+}
+
+/* Phones: the tree sits above the garden in a short band. */
+@media (max-width: 720px) {
+  .app {
+    flex-direction: column;
+    height: auto;
+    padding: 16px;
+  }
+
+  .lineage {
+    flex: none;
+    height: 200px;
+  }
+
+  .garden {
+    overflow: visible;
+  }
 }

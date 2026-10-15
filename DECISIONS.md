@@ -38,3 +38,15 @@ Each entry: **what** we decided, **why**, and anything left **open**.
 ### 2026-10-14 · Mutation strength left open
 **What:** no decision yet on how strong mutations should be or whether to mix strengths. Open questions are listed in [ROADMAP.md](ROADMAP.md), alongside the "curious mode" idea.
 **Why:** this is easier to judge by trying it once the tree exists.
+
+### 2026-10-15 · Lineage tree in a left sidebar
+**What:** the lineage is stored as nodes `{ id, seed, parentId, seedlings }` with a `currentId`, and drawn in a left sidebar as a plant: root at the bottom, each bloom above its first child so the first branch grows straight up and later branches fork to the right. The path to the current bloom is highlighted; other branches are dimmed but clickable. Each node keeps its 9 seedlings, so returning to it shows the same choices, and picking an already-picked seedling returns to its node instead of duplicating it. On phones the tree sits in a short band above the garden.
+**Why:** a linear strip hid the old branch as soon as a new one started; seeing every branch makes each move visibly reversible. A sidebar gives the tree room to grow upward without squeezing the chorus line.
+
+### 2026-10-15 · Re-sprout replaces the seedlings
+**What:** a quiet ↻ icon above the grid sprouts 9 fresh seedlings from the current parent and replaces the stored set. The old set is not kept.
+**Why:** simpler than flipping between sets; anything worth keeping was picked, and picked seedlings live on in the tree. A small icon keeps the "pick one" action as the main choice.
+
+### 2026-10-15 · Still thumbnails in the tree
+**What:** blooms in the lineage tree are still images of the bloom at rest (t = 0), drawn once by one hidden p5 instance and cached per seed. No animation, not even on hover.
+**Why:** the tree is for finding your way, not comparing motion; the chorus line already covers motion. One loop per tree node would slow down as the tree grows.
