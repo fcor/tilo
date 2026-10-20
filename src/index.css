@@ -85,8 +85,8 @@ body {
   max-width: 480px;
 }
 
-/* Below the grid, so the grid's top edge lines up with the parent. */
-.seedlings-bar {
+/* Below each block, so the parent's and grid's top edges line up. */
+.toolbar {
   display: flex;
   justify-content: flex-end;
   margin-top: 8px;

@@ -42,6 +42,7 @@ src/
   BloomCanvas.jsx  one p5 instance (instance mode) per animated bloom
   BloomThumbnail.jsx  still image of a bloom, drawn once by a shared p5 instance
   LineageTree.jsx  lays out and draws the lineage tree
+  exportBloom.js   renders a bloom at 2048px and downloads it as a PNG
   App.jsx          lineage tree state, layout
   index.css
 ```

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import BloomCanvas from './BloomCanvas.jsx'
 import LineageTree from './LineageTree.jsx'
+import { downloadBloomPng } from './exportBloom.js'
 import { randomSeed, sprout, MUTATION_RATE } from './seed.js'
 
 const NUM_SEEDLINGS = 9
@@ -46,6 +47,11 @@ export default function App() {
     setLineage({ nodes: nodes.map((node) => (node.id === currentId ? resprouted : node)), currentId })
   }
 
+  // Same clock as BloomCanvas, so the PNG is the frame on screen right now.
+  function downloadPng() {
+    downloadBloomPng(current.seed, performance.now() / 1000)
+  }
+
   // Selecting a node in the tree only moves the pointer; nothing is discarded.
   function goTo(id) {
     setLineage({ nodes, currentId: id })
@@ -60,6 +66,11 @@ export default function App() {
       <div className="garden">
         <section className="parent">
           <BloomCanvas seed={current.seed} />
+          <div className="toolbar">
+            <button className="icon-button" onClick={downloadPng} title="Download PNG" aria-label="Download PNG">
+              ↓
+            </button>
+          </div>
         </section>
         <section className="seedlings">
           <div className="seedlings-grid">
@@ -68,7 +79,7 @@ export default function App() {
               <BloomCanvas key={i} seed={seedling} onClick={() => pickSeedling(seedling)} />
             ))}
           </div>
-          <div className="seedlings-bar">
+          <div className="toolbar">
             <button className="icon-button" onClick={resprout} title="Re-sprout" aria-label="Re-sprout">
               ↻
             </button>

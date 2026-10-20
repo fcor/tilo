@@ -44,7 +44,7 @@ Items marked **❓** have open questions to think through before building them.
 
 - [ ] **Interface pass:** desktop first but mobile friendly; layout, typography, hover and selection states, transitions when seedlings sprout.
 - [ ] **Identity:** logo, name in the header, credits (Compton & Mateas, *Casual Creators*, ICCC 2015; Funky Ikebana as the closest precedent) and an about panel.
-- [ ] **Saving and export:** download a bloom as PNG, SVG or GIF; save and load a whole lineage as JSON.
+- [ ] **Saving and export:** download a bloom as PNG, SVG or GIF; save and load a whole lineage as JSON. PNG is done.
 - [x] **Deploy:** GitHub Pages via a GitHub Actions workflow (Vite `base: './'`, so it works under `/tilo/`).
 
 ## Nice to have

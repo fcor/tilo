@@ -58,3 +58,7 @@ Each entry: **what** we decided, **why**, and anything left **open**.
 ### 2026-10-20 · Deploy to GitHub Pages with relative paths
 **What:** a GitHub Actions workflow builds on every push to `master` and publishes `dist` to GitHub Pages. Vite's `base` is `'./'` instead of `'/tilo/'`.
 **Why:** relative paths keep working if the repo is renamed or moved to a custom domain, and the dev server URL stays at `/`. Tilo is one page with no router, so relative paths are enough.
+
+### 2026-10-20 · PNG export of the parent, frozen at the current frame
+**What:** a quiet ↓ icon below the parent downloads it as a 2048×2048 PNG on the dark background, named by date and time (`tilo-20261020-143005.png`). It is drawn fresh by a throwaway p5 instance at the moment on the shared clock when the button was pressed. SVG, GIF and lineage JSON are left for later.
+**Why:** redrawing at full size gives a sharp image regardless of screen size, unlike copying the on-screen canvas. Freezing the current frame means you get what you see. Only the parent can be exported: picking a seedling first keeps "pick one" the main action.
