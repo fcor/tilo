@@ -62,16 +62,16 @@ export default function App() {
           <BloomCanvas seed={current.seed} />
         </section>
         <section className="seedlings">
-          <div className="seedlings-bar">
-            <button className="icon-button" onClick={resprout} title="Re-sprout" aria-label="Re-sprout">
-              ↻
-            </button>
-          </div>
           <div className="seedlings-grid">
             {current.seedlings.map((seedling, i) => (
               // Index keys keep each p5 instance alive; only its seed changes.
               <BloomCanvas key={i} seed={seedling} onClick={() => pickSeedling(seedling)} />
             ))}
+          </div>
+          <div className="seedlings-bar">
+            <button className="icon-button" onClick={resprout} title="Re-sprout" aria-label="Re-sprout">
+              ↻
+            </button>
           </div>
         </section>
       </div>

@@ -18,10 +18,10 @@ Items marked **❓** have open questions to think through before building them.
 - [x] Still thumbnails in the lineage tree, drawn once by a single shared p5 instance
 - [x] Botanical naming (seed, trait, bloom, parent, seedlings, sprout, lineage)
 - [x] README, roadmap, design direction, decision log
+- [x] Garden layout: parent and grid shrink side by side (down to 280px each) before wrapping; re-sprout sits below the grid so tops line up
 
 ## Now
 
-- [ ] **Garden layout with the sidebar.** At around 1200px wide the seedling grid wraps below the parent instead of sitting beside it: the 240px tree sidebar plus the parent and grid (480px each + gap) need about 1000px. That pushes the seedlings below the fold on many laptops and breaks the side-by-side chorus line. Let the parent and grid shrink to fit side by side before wrapping. Also check the grid now starts lower than the parent because of the re-sprout button's row.
 
 ## Next: evolving something meaningful
 
@@ -45,7 +45,7 @@ Items marked **❓** have open questions to think through before building them.
 - [ ] **Interface pass:** desktop first but mobile friendly; layout, typography, hover and selection states, transitions when seedlings sprout.
 - [ ] **Identity:** logo, name in the header, credits (Compton & Mateas, *Casual Creators*, ICCC 2015; Funky Ikebana as the closest precedent) and an about panel.
 - [ ] **Saving and export:** download a bloom as PNG, SVG or GIF; save and load a whole lineage as JSON.
-- [ ] **Deploy:** GitHub Pages via a GitHub Actions workflow (set Vite's `base` to the repo name).
+- [x] **Deploy:** GitHub Pages via a GitHub Actions workflow (Vite `base: './'`, so it works under `/tilo/`).
 
 ## Nice to have
 

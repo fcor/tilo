@@ -50,3 +50,11 @@ Each entry: **what** we decided, **why**, and anything left **open**.
 ### 2026-10-15 · Still thumbnails in the tree
 **What:** blooms in the lineage tree are still images of the bloom at rest (t = 0), drawn once by one hidden p5 instance and cached per seed. No animation, not even on hover.
 **Why:** the tree is for finding your way, not comparing motion; the chorus line already covers motion. One loop per tree node would slow down as the tree grows.
+
+### 2026-10-20 · Garden shrinks before it wraps; re-sprout below the grid
+**What:** the parent and seedling grid share the row with a zero flex basis, growing up to 480px and shrinking down to 280px each before the grid wraps below the parent. The ↻ re-sprout icon moved from above the grid to below it, right-aligned.
+**Why:** with the tree sidebar, fixed 480px blocks wrapped at common laptop widths and pushed the seedlings below the fold, breaking the side-by-side chorus line. With the icon above, the grid started 40px lower than the parent; below, both top edges line up.
+
+### 2026-10-20 · Deploy to GitHub Pages with relative paths
+**What:** a GitHub Actions workflow builds on every push to `master` and publishes `dist` to GitHub Pages. Vite's `base` is `'./'` instead of `'/tilo/'`.
+**Why:** relative paths keep working if the repo is renamed or moved to a custom domain, and the dev server URL stays at `/`. Tilo is one page with no router, so relative paths are enough.

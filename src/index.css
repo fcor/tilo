@@ -77,18 +77,19 @@ body {
   justify-content: center;
 }
 
-.parent {
-  width: min(480px, 100%);
-}
-
+/* A zero basis lets both shrink side by side down to min-width before the row wraps. */
+.parent,
 .seedlings {
-  width: min(480px, 100%);
+  flex: 1 1 0;
+  min-width: 280px;
+  max-width: 480px;
 }
 
+/* Below the grid, so the grid's top edge lines up with the parent. */
 .seedlings-bar {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 8px;
+  margin-top: 8px;
 }
 
 .seedlings-grid {

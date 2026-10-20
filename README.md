@@ -15,6 +15,10 @@ npm install
 npm run dev
 ```
 
+## Deploy
+
+Every push to `master` builds the app and publishes it to GitHub Pages at <https://fcor.github.io/tilo/> (`.github/workflows/deploy.yml`). It can also be run by hand from the Actions tab.
+
 ## Naming
 
 *Tilo* is Spanish for the linden tree, so the code uses plant-breeding terms:
