@@ -1,5 +1,5 @@
 import p5 from 'p5'
-import { drawBloom } from './drawBloom.js'
+import { drawBloom, BACKGROUND } from './drawBloom.js'
 
 const EXPORT_SIZE = 2048 // px; large enough to print or use as a wallpaper
 
@@ -27,7 +27,7 @@ function renderBloom(seed, t) {
         p.createCanvas(EXPORT_SIZE, EXPORT_SIZE)
         p.colorMode(p.HSB, 360, 100, 100, 1)
         p.noLoop()
-        p.background(0, 0, 12)
+        p.background(...BACKGROUND)
         p.translate(EXPORT_SIZE / 2, EXPORT_SIZE / 2)
         drawBloom(p, seed, EXPORT_SIZE, t)
         p.canvas.toBlob((blob) => {

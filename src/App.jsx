@@ -2,6 +2,7 @@ import { useState } from 'react'
 import BloomCanvas from './BloomCanvas.jsx'
 import LineageTree from './LineageTree.jsx'
 import { downloadBloomPng } from './exportBloom.js'
+import { playPress } from './press.js'
 import { randomSeed, sprout, MUTATION_RATE } from './seed.js'
 
 const NUM_SEEDLINGS = 9
@@ -58,34 +59,63 @@ export default function App() {
   }
 
   return (
-    <main className="app">
-      <aside className="lineage">
-        <LineageTree nodes={nodes} currentId={currentId} onSelect={goTo} />
-      </aside>
+    <div className="app">
+      <header className="header">
+        <h1 className="logo">
+          <span className="logo-mark" aria-hidden="true">✿</span> tilo
+        </h1>
+      </header>
 
-      <div className="garden">
-        <section className="parent">
-          <BloomCanvas seed={current.seed} />
-          <div className="toolbar">
-            <button className="icon-button" onClick={downloadPng} title="Download PNG" aria-label="Download PNG">
-              ↓
-            </button>
-          </div>
-        </section>
-        <section className="seedlings">
-          <div className="seedlings-grid">
-            {current.seedlings.map((seedling, i) => (
-              // Index keys keep each p5 instance alive; only its seed changes.
-              <BloomCanvas key={i} seed={seedling} onClick={() => pickSeedling(seedling)} />
-            ))}
-          </div>
-          <div className="toolbar">
-            <button className="icon-button" onClick={resprout} title="Re-sprout" aria-label="Re-sprout">
-              ↻
-            </button>
-          </div>
-        </section>
-      </div>
-    </main>
+      <main className="workspace">
+        <aside className="lineage">
+          <LineageTree nodes={nodes} currentId={currentId} onSelect={goTo} />
+        </aside>
+
+        <div className="garden">
+          <section className="parent">
+            <BloomCanvas seed={current.seed} />
+            <div className="toolbar">
+              <button
+                className="icon-button primary hop-on-hover"
+                onClick={(e) => {
+                  playPress(e.currentTarget, 'drop')
+                  downloadPng()
+                }}
+                title="Download PNG"
+                aria-label="Download PNG"
+              >
+                <span className="icon-glyph">↓</span>
+              </button>
+            </div>
+          </section>
+          <section className="seedlings">
+            <div className="seedlings-grid">
+              {current.seedlings.map((seedling, i) => (
+                // Index keys keep each p5 instance alive; only its seed changes.
+                <BloomCanvas
+                  key={i}
+                  seed={seedling}
+                  onClick={() => pickSeedling(seedling)}
+                  popDelay={60 + i * 30}
+                />
+              ))}
+            </div>
+            <div className="toolbar">
+              <button
+                className="icon-button primary spin-on-hover"
+                onClick={(e) => {
+                  playPress(e.currentTarget, 'spin')
+                  resprout()
+                }}
+                title="Re-sprout"
+                aria-label="Re-sprout"
+              >
+                <span className="icon-glyph">↻</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
   )
 }

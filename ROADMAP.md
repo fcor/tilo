@@ -19,11 +19,29 @@ Items marked **❓** have open questions to think through before building them.
 - [x] Botanical naming (seed, trait, bloom, parent, seedlings, sprout, lineage)
 - [x] README, roadmap, design direction, decision log
 - [x] Garden layout: parent and grid shrink side by side (down to 280px each) before wrapping; re-sprout sits below the grid so tops line up
+- [x] Deploy: GitHub Pages via a GitHub Actions workflow (Vite `base: './'`, so it works under `/tilo/`)
+- [x] PNG export: the parent as a 2048×2048 PNG, frozen at the current frame
+- [x] Interface pass, styled after Chrome Music Lab:
+  - white page with an edge-to-edge hairline grid
+  - sunny yellow tree bed with pink stems, white bloom circles and a pink ring on the current bloom
+  - Nunito type with a pink ✿
+  - seedling hover: a light yellow tint and the bloom grows, with no border
+  - seedlings pop in as a ripple when they sprout
+  - pink round buttons that spin (↻) or drop (↓) on hover, and on click bounce while the icon repeats its move
 
 ## Now
 
+Nothing in progress. The next big step is the bloom rework below; most of "Next" waits on it.
+
+## Bloom aesthetics
+
+- [ ] **Rework how blooms look,** using stronger creative coding algorithms and compositions. This comes before most of "Next", because mutation tuning, starting styles and perceptual traits all depend on what the traits end up being.
+  - Fit the interface: Chrome Music Lab uses solid, flat colors. Today blooms are 75% opaque, so pale yellows and limes look washed out on white.
+  - ❓ Should blooms use the brand palette (yellow, pink, green) or keep the full hue range?
 
 ## Next: evolving something meaningful
+
+All of these except "Start over" depend on the bloom rework above.
 
 - [ ] ❓ **Mutation: related but perceptibly different.** Seedlings should clearly come from their parent, but never look identical to it ("1000 bowls of oatmeal"). Today the discrete traits (sides, copies) jump between whole numbers, which can make a seedling look unrelated.
   - How much should one pick change? Small steps feel like refining; big ones feel like creative leaps. The paper favors leaps.
@@ -42,10 +60,9 @@ Items marked **❓** have open questions to think through before building them.
 
 ## Later
 
-- [ ] **Interface pass:** desktop first but mobile friendly; layout, typography, hover and selection states, transitions when seedlings sprout.
-- [ ] **Identity:** logo, name in the header, credits (Compton & Mateas, *Casual Creators*, ICCC 2015; Funky Ikebana as the closest precedent) and an about panel.
-- [ ] **Saving and export:** download a bloom as PNG, SVG or GIF; save and load a whole lineage as JSON. PNG is done.
-- [x] **Deploy:** GitHub Pages via a GitHub Actions workflow (Vite `base: './'`, so it works under `/tilo/`).
+- [ ] **Identity:** a real logo (the header has a simple "✿ tilo" wordmark and favicon for now), credits (Compton & Mateas, *Casual Creators*, ICCC 2015; Funky Ikebana as the closest precedent; Chrome Music Lab as the interface reference) and an about panel.
+- [ ] **Saving and export:** SVG or GIF of a bloom; save and load a whole lineage as JSON. (PNG is done.)
+- [ ] **Tree polish:** blooms are drawn small inside the tree's white circles and read as dots; draw them larger so the tree is easier to scan.
 
 ## Nice to have
 

@@ -4,6 +4,9 @@
 
 const PULSE_SPEED = 2 // radians per second, shared by every bloom so they dance in sync
 
+// Behind every bloom, in HSB. Matches --tile in index.css (white).
+export const BACKGROUND = [0, 0, 100]
+
 export function drawBloom(p, seed, size, t) {
   const sides = Math.round(p.lerp(3, 8, seed.sides))
   const copies = Math.round(p.lerp(1, 6, seed.copies))

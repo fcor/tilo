@@ -2,7 +2,9 @@
 
 A small creative tool for breeding animated shapes. It is based on the "mutant shopping" and "chorus line" patterns from Compton & Mateas, *Casual Creators* (ICCC 2015).
 
-A parent bloom is shown large, next to 9 mutated seedlings. Click a seedling to make it the new parent, and 9 fresh seedlings sprout. All blooms animate in sync, so differences in motion are easy to compare. The panel on the left shows the lineage as a plant growing upward from the first seed. Click any bloom in it to make it the parent again, with the same seedlings it had. Nothing is ever discarded: picking a different seedling grows a new branch.
+A parent bloom is shown large, next to 9 mutated seedlings. Click a seedling to make it the new parent, and 9 fresh seedlings sprout. All blooms animate in sync, so differences in motion are easy to compare. The panel on the left shows the lineage as a plant growing upward from the first seed. Click any bloom in it to make it the parent again, with the same seedlings it had. Nothing is ever discarded: picking a different seedling grows a new branch. The ↻ button sprouts a fresh set of seedlings, and ↓ downloads the parent as a PNG.
+
+The interface is styled after Chrome Music Lab: a white page, a hairline grid, solid color blocks and bouncy motion.
 
 - [ROADMAP.md](ROADMAP.md): planned features and open questions
 - [DESIGN-DIRECTION.md](DESIGN-DIRECTION.md): design foundation from the *Casual Creators* paper
@@ -43,8 +45,9 @@ src/
   BloomThumbnail.jsx  still image of a bloom, drawn once by a shared p5 instance
   LineageTree.jsx  lays out and draws the lineage tree
   exportBloom.js   renders a bloom at 2048px and downloads it as a PNG
+  press.js         one-shot click bounce for the round buttons
   App.jsx          lineage tree state, layout
-  index.css
+  index.css        all styles; the colors are variables at the top
 ```
 
 ## Adding a trait

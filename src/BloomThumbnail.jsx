@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import p5 from 'p5'
-import { drawBloom } from './drawBloom.js'
+import { drawBloom, BACKGROUND } from './drawBloom.js'
 
 const IMAGE_SIZE = 96 // px; twice the tree's bloom size so it stays sharp on retina screens
 
@@ -33,7 +33,7 @@ function bloomImage(seed) {
       seed,
       getRenderer().then((p) => {
         p.push()
-        p.background(0, 0, 12)
+        p.background(...BACKGROUND)
         p.translate(IMAGE_SIZE / 2, IMAGE_SIZE / 2)
         drawBloom(p, seed, IMAGE_SIZE, 0) // t = 0: the bloom at rest, before any spin or pulse
         p.pop()

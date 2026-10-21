@@ -1,3 +1,18 @@
+/* After Chrome Music Lab: a white page with hairline grid lines, color only in
+   solid blocks (the yellow tree bed) and pink for actions and "you are here", big
+   round buttons that bounce, and hover shown by motion and a light tint, never by a border. */
+:root {
+  --yellow: #ffdd33; /* a sunnier take on the brand #d9d600, which reads lime and looks muddy on pink */
+  --pink: #e6215b;
+  --white: #ffffff;
+  --ink: #222222;
+  --hairline: #e4e4e4;
+  --tint: #fffae0; /* yellow at ~15% on white: hover on a seedling */
+
+  /* Overshoots a little, then settles: the "bouncy" feel. */
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -5,24 +20,57 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: #111;
-  color: #eee;
-  font-family: system-ui, sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  font-family: 'Nunito', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .app {
   display: flex;
-  gap: 24px;
-  padding: 24px;
+  flex-direction: column;
   height: 100vh;
 }
 
-/* Lineage: a tree that grows upward from the first seed, in its own scroll area. */
+.header {
+  flex: none;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.logo-mark {
+  display: inline-block;
+  color: var(--pink);
+  transition: transform 0.6s var(--spring);
+}
+
+.logo:hover .logo-mark {
+  transform: rotate(72deg) scale(1.15); /* one petal's turn */
+}
+
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* Lineage: a solid yellow bed, the tree growing upward from the first seed in pink. */
 .lineage {
   flex: 0 0 240px;
   display: flex;
   overflow: auto;
-  padding: 4px; /* room for the outlines */
+  padding: 16px;
+  background: var(--yellow);
 }
 
 /* Auto margins push a small tree to the bottom center without hiding overflow. */
@@ -39,12 +87,15 @@ body {
 
 .tree-stems path {
   fill: none;
-  stroke: #333;
-  stroke-width: 2;
+  stroke: var(--pink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke-width 0.2s;
 }
 
+/* The path to the current bloom is marked by weight, not fading: faded pink on yellow turns orange. */
 .tree-stems path.on-stem {
-  stroke: #888;
+  stroke-width: 5;
 }
 
 .tree-node {
@@ -53,17 +104,24 @@ body {
   transform: translate(-50%, -50%);
 }
 
+/* Blooms in the tree are white circles. */
+.lineage .bloom-canvas {
+  border-radius: 50%;
+  background: var(--white);
+}
+
 .lineage .bloom-canvas.current {
-  outline: 2px solid #eee;
+  box-shadow: 0 0 0 4px var(--pink);
 }
 
-/* Blooms off the path to the current one: kept, dimmed, still clickable. */
-.lineage .bloom-canvas.off-stem {
-  opacity: 0.5;
-  transition: opacity 0.15s;
+/* Blooms off the path to the current one: kept, dimmed, still clickable. Only the
+   bloom fades; the white circle stays solid so the stems behind it never show through. */
+.lineage .bloom-canvas.off-stem img {
+  opacity: 0.4;
+  transition: opacity 0.2s;
 }
 
-.lineage .bloom-canvas.off-stem:hover {
+.lineage .bloom-canvas.off-stem:hover img {
   opacity: 1;
 }
 
@@ -72,9 +130,10 @@ body {
   overflow: auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 32px;
   align-items: flex-start;
   justify-content: center;
+  padding: 32px;
 }
 
 /* A zero basis lets both shrink side by side down to min-width before the row wraps. */
@@ -85,82 +144,175 @@ body {
   max-width: 480px;
 }
 
+.parent .bloom-canvas {
+  border: 1px solid var(--hairline);
+}
+
+/* Hairline grid: the grid draws its top and left edge, each cell its right and bottom. */
+.seedlings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--hairline);
+  border-left: 1px solid var(--hairline);
+}
+
+.seedlings-grid .bloom-canvas {
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+
 /* Below each block, so the parent's and grid's top edges line up. */
 .toolbar {
   display: flex;
   justify-content: flex-end;
-  margin-top: 8px;
+  align-items: center;
+  height: 72px;
 }
 
-.seedlings-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
+/* Big round buttons that bounce under the pointer. */
 .icon-button {
-  width: 32px;
-  height: 32px;
   border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #888;
-  font-size: 20px;
+  border-radius: 50%;
+  font: inherit;
+  font-weight: 800;
   line-height: 1;
   cursor: pointer;
-  transition: color 0.15s, background-color 0.15s;
+  transition: transform 0.35s var(--spring), box-shadow 0.2s;
 }
 
+/* Pink circles with white icons, like Music Lab's play button. */
+.icon-button.primary {
+  width: 56px;
+  height: 56px;
+  background: var(--pink);
+  color: var(--white);
+  font-size: 26px;
+}
+
+/* Hover grows the button and moves its icon; a click adds a one-shot bounce on top (press.js). */
 .icon-button:hover {
-  color: #eee;
-  background: #222;
+  transform: scale(1.12);
+}
+
+.icon-glyph {
+  display: inline-block;
+  transition: transform 0.25s var(--spring);
+}
+
+/* ↻ turns half a turn on hover. */
+.icon-button.spin-on-hover .icon-glyph {
+  transition-duration: 0.35s;
+}
+
+.icon-button.spin-on-hover:hover .icon-glyph {
+  transform: rotate(180deg);
+}
+
+/* Clips the arrow as it falls through the button on click (press.js). */
+.icon-button.hop-on-hover {
+  overflow: hidden;
+}
+
+/* The download arrow drops once on hover. */
+.icon-button.hop-on-hover:hover .icon-glyph {
+  transform: translateY(5px);
 }
 
 .icon-button:focus-visible {
-  outline: 2px solid #888;
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
 }
 
-/* Square box; the p5 canvas fills it exactly. */
+/* A square cell; the stage inside it holds the p5 canvas or the still image. */
 .bloom-canvas {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 8px;
+  background: var(--white);
 }
 
-.bloom-canvas canvas,
+.bloom-stage,
 .bloom-canvas img {
-  width: 100%;
-  height: 100%;
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.bloom-stage canvas {
   display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .bloom-canvas.clickable {
   cursor: pointer;
-  outline: 2px solid transparent;
-  transition: outline-color 0.15s;
+  transition: background-color 0.2s, opacity 0.2s;
 }
 
+.bloom-stage {
+  transition: transform 0.4s var(--spring);
+}
+
+/* Hover: the cell warms to a light yellow and the bloom grows a little. */
 .bloom-canvas.clickable:hover {
-  outline-color: #888;
+  background: var(--tint);
+}
+
+.bloom-canvas.clickable:hover .bloom-stage {
+  transform: scale(1.1);
+}
+
+.bloom-canvas.clickable:active .bloom-stage {
+  transform: scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-mark,
+  .icon-button,
+  .bloom-stage {
+    transition: none;
+  }
+
+  .logo:hover .logo-mark,
+  .icon-button:hover,
+  .bloom-canvas.clickable:hover .bloom-stage,
+  .bloom-canvas.clickable:active .bloom-stage {
+    transform: none;
+  }
+
+  .icon-glyph,
+  .icon-button.spin-on-hover .icon-glyph {
+    transition: none;
+  }
+
+  .icon-button.spin-on-hover:hover .icon-glyph,
+  .icon-button.hop-on-hover:hover .icon-glyph {
+    transform: none;
+  }
 }
 
 /* Phones: the tree sits above the garden in a short band. */
 @media (max-width: 720px) {
   .app {
-    flex-direction: column;
     height: auto;
-    padding: 16px;
+  }
+
+  .header {
+    padding: 14px 16px;
+  }
+
+  .workspace {
+    flex-direction: column;
   }
 
   .lineage {
     flex: none;
-    height: 200px;
+    height: 180px;
   }
 
   .garden {
     overflow: visible;
+    padding: 16px;
   }
 }
