@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:study": "node --test src/study/seeds.test.js",
+    "test": "node --test src/art/seeds.test.js src/study/seeds.test.js src/treeView.test.js"
   },
   "dependencies": {
+    "chromotome": "1.21.4",
     "p5": "^1.11.13",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

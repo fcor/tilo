@@ -27,43 +27,52 @@ function getRenderer() {
 
 // Seeds are never changed after they're made, so each one is drawn at most once.
 const images = new WeakMap()
-function bloomImage(seed) {
-  if (!images.has(seed)) {
-    images.set(
-      seed,
+function bloomImage(seed, renderer) {
+  if (!images.has(seed)) images.set(seed, new Map())
+  const renders = images.get(seed)
+  if (!renders.has(renderer)) {
+    renders.set(
+      renderer,
       getRenderer().then((p) => {
         p.push()
         p.background(...BACKGROUND)
         p.translate(IMAGE_SIZE / 2, IMAGE_SIZE / 2)
-        drawBloom(p, seed, IMAGE_SIZE, 0) // t = 0: the bloom at rest, before any spin or pulse
+        renderer(p, seed, IMAGE_SIZE * 1.15)
         p.pop()
         return p.canvas.toDataURL()
       }),
     )
   }
-  return images.get(seed)
+  return renders.get(renderer)
 }
 
 // A still image of a bloom, for places that show many of them (the lineage tree).
-export default function BloomThumbnail({ seed, onClick, className = '' }) {
+export default function BloomThumbnail({
+  seed, onClick, className = '', renderer = drawBloom, label, current = false,
+}) {
   const [src, setSrc] = useState(null)
 
   useEffect(() => {
     let cancelled = false
-    bloomImage(seed).then((url) => {
+    bloomImage(seed, renderer).then((url) => {
       if (!cancelled) setSrc(url)
     })
     return () => {
       cancelled = true
     }
-  }, [seed])
+  }, [seed, renderer])
 
+  const Cell = onClick ? 'button' : 'div'
   return (
-    <div
+    <Cell
       className={['bloom-canvas', onClick && 'clickable', className].filter(Boolean).join(' ')}
+      type={onClick ? 'button' : undefined}
+      aria-label={label ?? (onClick ? 'Return to this bloom' : undefined)}
+      aria-current={current ? 'step' : undefined}
+      role={!onClick && label ? 'img' : undefined}
       onClick={onClick}
     >
       {src && <img src={src} alt="" draggable={false} />}
-    </div>
+    </Cell>
   )
 }

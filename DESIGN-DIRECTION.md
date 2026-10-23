@@ -4,7 +4,7 @@ Source: Kate Compton & Michael Mateas, *Casual Creators*, Proceedings of the Six
 
 This document is the design foundation for **Tilo**. Use it to guide product and UX decisions. Sections marked **"For Tilo"** are our interpretation, not claims from the paper.
 
-**Terminology:** the "For Tilo" notes use Tilo's botanical terms. A **seed** is the set of numbers a **bloom** (the animated shape) grows from; the paper and other systems call this a genome or DNA. Each value in a seed is a **trait**. The **parent** is the selected bloom, and its **seedlings** are mutated variations sprouted from it. The **lineage** is the history of picks.
+**Terminology:** the "For Tilo" notes use Tilo's botanical terms. A **seed** is the set of numbers a **bloom** (the static artwork) grows from; the paper and other systems call this a genome or DNA. Each value in a seed is a **trait**. The **parent** is the selected bloom, and its **seedlings** are mutated variations sprouted from it. The **lineage** is the history of picks.
 
 ---
 
@@ -75,7 +75,7 @@ Named after dancers performing the same routine in unison. First used in *Spore*
 
 When the output is a **space of artifacts** rather than one, show **many examples at once**, overlaid spatially, temporally or graphically, so subtle differences and similarities stand out.
 
-**For Tilo:** all blooms animate together and in sync, so differences in motion traits (spin, pulse) can be compared directly. Some traits are only visible in motion.
+**For Tilo:** show the parent and nine still variations together, so differences in contour, composition and color can be compared directly. The user prefers static artwork; hover and click feedback remain part of the interface.
 
 ### 4.3 Simulation and approximate feedback
 When an artifact takes too long to judge directly (for example a game level), show a **proxy** of its evaluation. For a casual creator, accuracy matters less than giving the **perception of progress** that flow requires.
@@ -149,7 +149,7 @@ Lesson from Funky Ikebana: the user's preferences **drift** ("pick small, simple
 - [ ] Are choices **few and clear**? No choice paralysis.
 - [ ] Do mutations produce **perceptibly different** results? No oatmeal.
 - [ ] Is the space **safe**, with no broken or ugly-by-default artifacts?
-- [ ] Are variants shown **together and in sync** (chorus line)?
+- [ ] Are variants shown **together for direct comparison** (chorus line)?
 - [ ] Do traits map to **meaningful, perceptible** qualities?
 - [ ] Does the user feel the discovery is **theirs**?
 - [ ] Is it **fun to watch** while browsing, not just a means to an end?

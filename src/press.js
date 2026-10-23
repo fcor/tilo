@@ -13,6 +13,16 @@ const BOUNCE = [
 
 // Each icon repeats its hover move once more on click.
 const GLYPH_MOVES = {
+  color: {
+    keyframes: [
+      { transform: 'rotate(0) scale(1)' },
+      { transform: 'rotate(-28deg) scale(0.86)', offset: 0.3 },
+      { transform: 'rotate(18deg) scale(1.1)', offset: 0.65 },
+      { transform: 'rotate(0) scale(1)' },
+    ],
+    duration: 500,
+    easing: SPRING,
+  },
   spin: { keyframes: [{ transform: 'rotate(0)' }, { transform: 'rotate(360deg)' }], duration: 500, easing: SPRING },
   // The arrow falls out through the bottom of the button and drops back in from the top,
   // landing with the same spring and duration as the ↻ spin. The button clips it (index.css).

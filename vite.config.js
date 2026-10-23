@@ -5,4 +5,9 @@ export default defineConfig({
   plugins: [react()],
   // Relative asset paths, so the build works under any subpath (e.g. GitHub Pages at /tilo/).
   base: './',
+  build: {
+    rollupOptions: {
+      input: ['index.html', 'study.html'],
+    },
+  },
 })

@@ -4,10 +4,14 @@
 :root {
   --yellow: #ffdd33; /* a sunnier take on the brand #d9d600, which reads lime and looks muddy on pink */
   --pink: #e6215b;
+  --pink-action: #d51b50; /* Stronger contrast for small white button labels. */
   --white: #ffffff;
   --ink: #222222;
   --hairline: #e4e4e4;
   --tint: #fffae0; /* yellow at ~15% on white: hover on a seedling */
+  --garden-gap: clamp(16px, 2vw, 40px);
+  --garden-padding: clamp(16px, 2vw, 48px);
+  --toolbar-height: 72px;
 
   /* Overshoots a little, then settles: the "bouncy" feel. */
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -30,9 +34,14 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
 }
 
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   flex: none;
   padding: 18px 32px;
   border-bottom: 1px solid var(--hairline);
@@ -43,7 +52,7 @@ body {
   align-items: center;
   gap: 8px;
   margin: 0;
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
@@ -66,10 +75,12 @@ body {
 
 /* Lineage: a solid yellow bed, the tree growing upward from the first seed in pink. */
 .lineage {
-  flex: 0 0 240px;
+  flex: 0 0 clamp(176px, 16vw, 264px);
+  min-width: 0;
   display: flex;
-  overflow: auto;
-  padding: 16px;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
   background: var(--yellow);
 }
 
@@ -77,7 +88,8 @@ body {
 .tree {
   position: relative;
   flex: none;
-  margin: auto auto 0;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .tree-stems {
@@ -127,21 +139,185 @@ body {
 
 .garden {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
   overflow: auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 32px;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 32px;
+  padding: var(--garden-padding);
+  container: garden / size;
 }
 
-/* A zero basis lets both shrink side by side down to min-width before the row wraps. */
+/* Fit two equal squares and their controls into the actual available space.
+   Bound the scale on large monitors; auto margins center without hiding overflow
+   in a short window. The parent stays three times the width of one seedling. */
+.garden-board {
+  --panel-size: max(
+    224px,
+    min(800px, calc((100cqw - var(--garden-gap)) / 2), calc(100cqh - var(--toolbar-height)))
+  );
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--garden-gap);
+  flex: none;
+  width: min(100%, calc(var(--panel-size) * 2 + var(--garden-gap)));
+  margin: auto;
+}
+
 .parent,
 .seedlings {
-  flex: 1 1 0;
-  min-width: 280px;
-  max-width: 480px;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-choice {
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.header-choice:hover { color: var(--pink); }
+.header-choice:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+
+.parent:focus-visible,
+.starting-heading:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.lineage-view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: clip;
+  touch-action: none;
+  cursor: grab;
+}
+
+.lineage-view.dragging { cursor: grabbing; }
+.lineage-view.dragging * { cursor: grabbing; }
+.lineage-view:focus-visible { outline: 3px solid var(--ink); outline-offset: -3px; }
+
+.lineage-view .tree {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+}
+
+.lineage-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: 56px;
+  gap: 8px;
+}
+
+.icon-button.primary.compact {
+  width: 32px;
+  height: 32px;
+  background: var(--white);
+  color: var(--pink);
+}
+
+.compact .icon-glyph { width: 18px; height: 18px; }
+.lineage-controls .action-control:first-child .action-tooltip { left: 0; right: auto; }
+
+.starting-garden {
+  flex-direction: column;
+}
+
+.starting-board {
+  width: min(100%, max(224px, min(680px, 100cqw, calc(100cqh - 176px))));
+  flex: none;
+  margin: auto;
+}
+
+.starting-intro {
+  margin-bottom: 20px;
+}
+
+.starting-heading {
+  margin: 0 0 8px;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.starting-intro p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b6b6b;
+}
+
+.garden-actions { gap: 14px; }
+
+.action-control {
+  position: relative;
+  display: inline-flex;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.action-button:disabled:hover { transform: none; }
+.action-button:disabled:hover .icon-glyph { transform: none; }
+.action-button[aria-busy="true"] { cursor: wait; opacity: 0.65; }
+
+.action-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  z-index: 3;
+  width: max-content;
+  max-width: 210px;
+  padding: 7px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.4;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.25s var(--spring);
+}
+
+.action-control:hover .action-tooltip,
+.action-control:focus-within .action-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.action-colors:hover .icon-glyph { transform: rotate(-18deg); }
+.action-forms:hover .icon-glyph { transform: rotate(180deg); }
+.action-download { overflow: hidden; }
+.action-download:hover .icon-glyph { transform: translateY(4px); }
+
+.garden-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .parent .bloom-canvas {
@@ -166,7 +342,7 @@ body {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  height: 72px;
+  height: var(--toolbar-height);
 }
 
 /* Big round buttons that bounce under the pointer. */
@@ -225,6 +401,10 @@ body {
 
 /* A square cell; the stage inside it holds the p5 canvas or the still image. */
 .bloom-canvas {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
@@ -267,10 +447,24 @@ body {
   transform: scale(0.94);
 }
 
+.bloom-canvas.clickable:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+}
+
+/* Stack only when the garden itself is too narrow for useful comparisons. */
+@container garden (max-width: 480px) {
+  .garden-board {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(480px, 100%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .logo-mark,
   .icon-button,
-  .bloom-stage {
+  .bloom-stage,
+  .action-tooltip {
     transition: none;
   }
 
@@ -287,7 +481,9 @@ body {
   }
 
   .icon-button.spin-on-hover:hover .icon-glyph,
-  .icon-button.hop-on-hover:hover .icon-glyph {
+  .icon-button.hop-on-hover:hover .icon-glyph,
+  .action-button:hover .icon-glyph,
+  .action-tooltip {
     transform: none;
   }
 }
@@ -296,11 +492,16 @@ body {
 @media (max-width: 720px) {
   .app {
     height: auto;
+    min-height: 100dvh;
   }
 
   .header {
     padding: 14px 16px;
   }
+
+  .header-actions { gap: 12px; }
+
+  .starting-board { width: min(100%, 480px); }
 
   .workspace {
     flex-direction: column;
@@ -312,7 +513,13 @@ body {
   }
 
   .garden {
+    flex: none;
     overflow: visible;
     padding: 16px;
+    container-type: inline-size;
+  }
+
+  .garden-board {
+    width: min(100%, 800px);
   }
 }

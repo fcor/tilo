@@ -1,121 +1,115 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import BloomCanvas from './BloomCanvas.jsx'
+import GardenActions from './GardenActions.jsx'
+import ActionButton from './ActionButton.jsx'
 import LineageTree from './LineageTree.jsx'
 import { downloadBloomPng } from './exportBloom.js'
-import { playPress } from './press.js'
-import { randomSeed, sprout, MUTATION_RATE } from './seed.js'
-
-const NUM_SEEDLINGS = 9
-
-function sproutSeedlings(parent) {
-  return Array.from({ length: NUM_SEEDLINGS }, () => sprout(parent, MUTATION_RATE))
-}
-
-// A node is one picked bloom in the lineage tree. It keeps its seedlings,
-// so returning to it shows exactly what was on screen before.
-function makeNode(id, seed, parentId) {
-  return { id, seed, parentId, seedlings: sproutSeedlings(seed) }
-}
-
-// The lineage is a tree of every bloom picked so far. Nodes are never removed,
-// so a node's id is its index in `nodes`. `currentId` is the parent on screen.
-function startLineage() {
-  return { nodes: [makeNode(0, randomSeed(), null)], currentId: 0 }
-}
+import { createGarden, generationOf, pickBloom, resproutGarden, restoreBloom, showStarts } from './lineage.js'
 
 export default function App() {
-  const [lineage, setLineage] = useState(startLineage)
-  const { nodes, currentId } = lineage
+  const [garden, setGarden] = useState(createGarden)
+  const [notice, setNotice] = useState('')
+  const [downloading, setDownloading] = useState(false)
+  const { nodes, currentId, starts, choosing } = garden
   const current = nodes[currentId]
+  const headingRef = useRef(null)
 
-  function pickSeedling(seedling) {
-    // A seedling picked before already has a node; return to it instead of growing a duplicate.
-    const existing = nodes.find((node) => node.parentId === currentId && node.seed === seedling)
-    if (existing) {
-      setLineage({ nodes, currentId: existing.id })
-      return
-    }
+  useEffect(() => {
+    if (nodes.length) headingRef.current?.focus({ preventScroll: true })
+  }, [choosing])
 
-    // Otherwise grow a new node; if the parent already had children, this starts a new branch.
-    const node = makeNode(nodes.length, seedling, currentId)
-    setLineage({ nodes: [...nodes, node], currentId: node.id })
+  function pick(seed) {
+    setGarden((previous) => pickBloom(previous, seed))
+    setNotice(choosing ? 'Your bloom is planted. Pick a seedling to grow it.' : 'Bloom selected. Your previous bloom is saved in the lineage.')
   }
 
-  // Replaces the current parent's seedlings with a fresh set. Seedlings that were
-  // picked live on in the tree; the rest of the old set is gone.
-  function resprout() {
-    const resprouted = { ...current, seedlings: sproutSeedlings(current.seed) }
-    setLineage({ nodes: nodes.map((node) => (node.id === currentId ? resprouted : node)), currentId })
+  function resprout(colorsOnly) {
+    setGarden((previous) => resproutGarden(previous, colorsOnly))
+    setNotice(colorsOnly ? 'New colors. All nine shapes kept.' : 'Nine new blooms to explore.')
   }
 
-  // Same clock as BloomCanvas, so the PNG is the frame on screen right now.
-  function downloadPng() {
-    downloadBloomPng(current.seed, performance.now() / 1000)
-  }
-
-  // Selecting a node in the tree only moves the pointer; nothing is discarded.
   function goTo(id) {
-    setLineage({ nodes, currentId: id })
+    setGarden((previous) => restoreBloom(previous, id))
+    setNotice('Bloom restored with its saved seedlings.')
   }
+
+  async function downloadPng() {
+    if (downloading) return
+    setDownloading(true)
+    try {
+      await downloadBloomPng(current.seed)
+      setNotice('Bloom downloaded as a PNG.')
+    } catch {
+      setNotice('The PNG could not be downloaded. Please try again.')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const actions = <GardenActions onColors={() => resprout(true)} onForms={() => resprout(false)} />
 
   return (
     <div className="app">
       <header className="header">
-        <h1 className="logo">
-          <span className="logo-mark" aria-hidden="true">✿</span> tilo
-        </h1>
+        <h1 className="logo"><span className="logo-mark" aria-hidden="true">✿</span> tilo</h1>
+        <nav className="header-actions" aria-label="Tilo navigation">
+          {nodes.length > 0 && (
+            <button type="button" className="header-choice" onClick={() => {
+              if (choosing) goTo(currentId)
+              else { setGarden((previous) => showStarts(previous)); setNotice('Choose a new bloom. Your existing lineage is saved.') }
+            }}>
+              {choosing ? 'Back to garden' : 'New bloom'}
+            </button>
+          )}
+        </nav>
       </header>
 
       <main className="workspace">
-        <aside className="lineage">
-          <LineageTree nodes={nodes} currentId={currentId} onSelect={goTo} />
-        </aside>
-
-        <div className="garden">
-          <section className="parent">
-            <BloomCanvas seed={current.seed} />
-            <div className="toolbar">
-              <button
-                className="icon-button primary hop-on-hover"
-                onClick={(e) => {
-                  playPress(e.currentTarget, 'drop')
-                  downloadPng()
-                }}
-                title="Download PNG"
-                aria-label="Download PNG"
-              >
-                <span className="icon-glyph">↓</span>
-              </button>
+        {nodes.length > 0 && (
+          <aside className="lineage" aria-label="Bloom lineage">
+            <LineageTree nodes={nodes} currentId={currentId} onSelect={goTo} />
+          </aside>
+        )}
+        {choosing ? (
+          <div className="garden starting-garden">
+            <section className="starting-board" aria-labelledby="starting-heading">
+              <div className="starting-intro">
+                <h2 id="starting-heading" className="starting-heading" tabIndex={-1} ref={headingRef}>Pick a bloom to begin</h2>
+                <p>Choose something that catches your eye. See where it grows.</p>
+              </div>
+              <div className="seedlings-grid starting-grid">
+                {starts.map((seed, i) => (
+                  <BloomCanvas key={i} seed={seed} onClick={() => pick(seed)}
+                    label={`Choose starting bloom ${i + 1}`} popDelay={60 + i * 30} />
+                ))}
+              </div>
+              {actions}
+            </section>
+          </div>
+        ) : (
+          <div className="garden">
+            <div className="garden-board">
+              <section className="parent" aria-label={`Parent bloom, generation ${generationOf(nodes, currentId)}`}
+                tabIndex={-1} ref={headingRef}>
+                <BloomCanvas seed={current.seed} label="Current parent bloom" />
+                <div className="toolbar">
+                  <ActionButton action="download" onClick={downloadPng} busy={downloading} />
+                </div>
+              </section>
+              <section className="seedlings" aria-label="Seedlings. Pick one to grow">
+                <div className="seedlings-grid">
+                  {current.seedlings.map((seed, i) => (
+                    <BloomCanvas key={i} seed={seed} onClick={() => pick(seed)}
+                      label={`Pick seedling ${i + 1}`} popDelay={60 + i * 30} />
+                  ))}
+                </div>
+                {actions}
+              </section>
             </div>
-          </section>
-          <section className="seedlings">
-            <div className="seedlings-grid">
-              {current.seedlings.map((seedling, i) => (
-                // Index keys keep each p5 instance alive; only its seed changes.
-                <BloomCanvas
-                  key={i}
-                  seed={seedling}
-                  onClick={() => pickSeedling(seedling)}
-                  popDelay={60 + i * 30}
-                />
-              ))}
-            </div>
-            <div className="toolbar">
-              <button
-                className="icon-button primary spin-on-hover"
-                onClick={(e) => {
-                  playPress(e.currentTarget, 'spin')
-                  resprout()
-                }}
-                title="Re-sprout"
-                aria-label="Re-sprout"
-              >
-                <span className="icon-glyph">↻</span>
-              </button>
-            </div>
-          </section>
-        </div>
+          </div>
+        )}
       </main>
+      <p className="garden-live" role="status" aria-live="polite">{notice}</p>
     </div>
   )
 }
