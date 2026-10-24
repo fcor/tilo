@@ -131,3 +131,6 @@ Each entry: **what** we decided, **why**, and anything left **open**.
 **What:** on mobile (720px wide or less), place the lineage below the blooms in the scrolling page, as confirmed by the user. Grow from left to right, with other branches and roots in separate rows. Desktop retains upward growth in the left sidebar.
 **Behavior:** use the same saved nodes, stems and navigation in both orientations. Resizing across the breakpoint frames the current bloom at a readable scale without changing the garden. Horizontal auto-framing starts from the left and follows new growth; Fit shows the overview and Find centers the current bloom.
 **Return cue:** route the pointer around a short horizontal row. Start the one-time hint’s animation and 3.5-second countdown when its bubble is actually on screen, so guidance does not expire before the user scrolls to it.
+
+### 2026-10-24 · MIT project license
+**What:** the user chose MIT for Tilo. Add the standard license with copyright attributed to Fabio Cortes, link it from the README, and record `MIT` in the package metadata. Chromotome retains its separate copyright and license notice.
