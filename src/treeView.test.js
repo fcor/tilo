@@ -12,6 +12,30 @@ test('large lineages and multiple roots have stable, distinct positions', () => 
   assert.ok(layout.centers[10000].x > layout.centers[10001].x)
 })
 
+test('horizontal trees grow right, branch into rows, and preserve every node across orientation changes', () => {
+  const nodes = [
+    { id: 0, parentId: null }, { id: 1, parentId: 0 },
+    { id: 2, parentId: 1 }, { id: 3, parentId: 0 }, { id: 4, parentId: null },
+  ]
+  const vertical = layoutTree(nodes)
+  const horizontal = layoutTree(nodes, true)
+  assert.equal(horizontal.width, vertical.height)
+  assert.equal(horizontal.height, vertical.width)
+  assert.equal(new Set(horizontal.centers.map(({ x, y }) => `${x},${y}`)).size, nodes.length)
+  for (const node of nodes) {
+    const from = horizontal.centers[node.parentId], to = horizontal.centers[node.id]
+    if (from) assert.ok(to.x > from.x)
+    assert.equal(to.x, vertical.height - vertical.centers[node.id].y)
+    assert.equal(to.y, vertical.centers[node.id].x)
+  }
+  assert.equal(horizontal.centers[1].x, horizontal.centers[3].x)
+  assert.ok(horizontal.centers[3].y > horizontal.centers[1].y)
+  assert.ok(horizontal.centers[4].y > horizontal.centers[3].y)
+  const fit = fitTree(horizontal, { width: 375, height: 124 })
+  assert.equal(fit.x, 16)
+  assert.equal(fit.y + horizontal.height * fit.k / 2, 62)
+})
+
 test('explicit Fit includes a large tree; automatic fitting preserves readable nodes', () => {
   const tree = { width: 1280, height: 2560 }
   const viewport = { width: 200, height: 600 }

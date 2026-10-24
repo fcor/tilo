@@ -12,7 +12,8 @@ function stemOf(nodes, id) {
 }
 
 export default function LineageTree({ nodes, currentId, onSelect }) {
-  const layout = useMemo(() => layoutTree(nodes), [nodes])
+  const [horizontal, setHorizontal] = useState(() => window.matchMedia('(max-width: 720px)').matches)
+  const layout = useMemo(() => layoutTree(nodes, horizontal), [nodes, horizontal])
   const stem = stemOf(nodes, currentId)
   const [viewport, setViewport] = useState({ width: 0, height: 0 })
   const [view, setView] = useState({ x: 0, y: 0, k: 1 })
@@ -47,6 +48,13 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
   viewRef.current = view
 
   useEffect(() => {
+    const query = window.matchMedia('(max-width: 720px)')
+    const change = (event) => setHorizontal(event.matches)
+    query.addEventListener('change', change)
+    return () => query.removeEventListener('change', change)
+  }, [])
+
+  useEffect(() => {
     const observer = new ResizeObserver(([entry]) => {
       setViewport({ width: entry.contentRect.width, height: entry.contentRect.height })
     })
@@ -71,18 +79,20 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
 
   useEffect(() => {
     const previous = sceneRef.current
-    const scene = { treeHeight: layout.height, count: nodes.length, currentId, ...viewport }
+    const scene = { treeHeight: layout.height, horizontal, count: nodes.length, currentId, ...viewport }
     sceneRef.current = scene
     if (!viewport.width || !viewport.height) return
-    const changed = !previous || previous.count !== nodes.length || previous.currentId !== currentId
+    const reoriented = previous && previous.horizontal !== horizontal
+    const changed = !previous || reoriented || previous.count !== nodes.length || previous.currentId !== currentId
     const resized = !previous || previous.width !== viewport.width || previous.height !== viewport.height
     if (!changed && !resized) return
+    if (reoriented) modeRef.current = 'auto'
     setView((old) => {
       if (modeRef.current === 'auto') {
         return constrainPan(revealBloom(layout.centers[currentId], viewport,
           fitTree(layout, viewport, READABLE_SCALE)), layout, viewport)
       }
-      const next = { ...old, y: old.y - (layout.height - (previous?.treeHeight ?? layout.height)) * old.k }
+      const next = { ...old, y: old.y - (horizontal ? 0 : layout.height - (previous?.treeHeight ?? layout.height)) * old.k }
       if (resized && previous) {
         next.x += (viewport.width - previous.width) / 2
         next.y += (viewport.height - previous.height) / 2
@@ -94,7 +104,7 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
       }
       return constrainPan(next, layout, viewport)
     })
-  }, [layout, nodes.length, currentId, viewport])
+  }, [layout, horizontal, nodes.length, currentId, viewport])
 
   useEffect(() => {
     const element = viewportRef.current
@@ -198,10 +208,15 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
   return (
     <>
       <div className={`lineage-view${dragging ? ' dragging' : ''}`} ref={viewportRef}
+        data-direction={horizontal ? 'horizontal' : 'vertical'}
         tabIndex={0} role="region" aria-label="Lineage map" aria-describedby={helpId}
         onPointerDown={pointerDown} onPointerMove={pointerMove}
         onPointerUp={pointerEnd} onPointerCancel={pointerEnd}
-        onLostPointerCapture={pointerEnd}
+        onLostPointerCapture={(event) => {
+          // Touch starts with implicit capture on the thumbnail. Transferring it
+          // to the map must not end the drag when the thumbnail loses capture.
+          if (event.target === event.currentTarget) pointerEnd(event)
+        }}
         onPointerLeave={() => { if (!dragRef.current?.active) dragRef.current = null }}
         onKeyDown={keyDown} onClickCapture={(event) => {
           if (draggedRef.current) { event.preventDefault(); event.stopPropagation() }
@@ -216,8 +231,11 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
               if (node.parentId === null) return null
               const from = layout.centers[node.parentId], to = layout.centers[node.id]
               const midY = (from.y + to.y) / 2
+              const midX = (from.x + to.x) / 2
               return <path key={node.id} className={stem.has(node.id) ? 'on-stem' : ''}
-                d={`M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`} />
+                d={horizontal
+                  ? `M ${from.x} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x} ${to.y}`
+                  : `M ${from.x} ${from.y} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y}`} />
             })}
           </svg>
           {nodes.map((node) => {

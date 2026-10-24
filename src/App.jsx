@@ -65,11 +65,6 @@ export default function App() {
       </header>
 
       <main className="workspace">
-        {nodes.length > 0 && (
-          <aside className="lineage" aria-label="Bloom lineage">
-            <LineageTree nodes={nodes} currentId={currentId} onSelect={goTo} />
-          </aside>
-        )}
         {choosing ? (
           <div className="garden starting-garden">
             <section className="starting-board" aria-labelledby="starting-heading">
@@ -107,6 +102,11 @@ export default function App() {
               </section>
             </div>
           </div>
+        )}
+        {nodes.length > 0 && (
+          <aside className="lineage" aria-label="Bloom lineage">
+            <LineageTree nodes={nodes} currentId={currentId} onSelect={goTo} />
+          </aside>
         )}
       </main>
       <p className="garden-live" role="status" aria-live="polite">{notice}</p>

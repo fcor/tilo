@@ -2,7 +2,7 @@ export const CELL = 64
 export const READABLE_SCALE = 0.7
 export const MAX_SCALE = 1.8
 
-export function layoutTree(nodes) {
+export function layoutTree(nodes, horizontal = false) {
   const children = nodes.map(() => [])
   for (const node of nodes) if (node.parentId !== null) children[node.parentId].push(node.id)
   const positions = []
@@ -29,11 +29,12 @@ export function layoutTree(nodes) {
   }
   return {
     centers: positions.map(({ column, depth }) => ({
-      x: (column + 0.5) * CELL,
-      y: (rows - depth - 0.5) * CELL,
+      x: (horizontal ? depth + 0.5 : column + 0.5) * CELL,
+      y: (horizontal ? column + 0.5 : rows - depth - 0.5) * CELL,
     })),
-    width: columns * CELL,
-    height: rows * CELL,
+    width: (horizontal ? rows : columns) * CELL,
+    height: (horizontal ? columns : rows) * CELL,
+    horizontal,
   }
 }
 
@@ -43,8 +44,8 @@ export function fitTree(tree, viewport, minimum = 0) {
     Math.max(1, viewport.height - 32) / tree.height,
   ))
   return {
-    x: (viewport.width - tree.width * k) / 2,
-    y: viewport.height - tree.height * k - 16,
+    x: tree.horizontal ? 16 : (viewport.width - tree.width * k) / 2,
+    y: tree.horizontal ? (viewport.height - tree.height * k) / 2 : viewport.height - tree.height * k - 16,
     k,
   }
 }

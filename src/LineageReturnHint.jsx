@@ -1,10 +1,34 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Keep the hint at screen size while the tree zooms, leaving the blooms uncovered.
 export default function LineageReturnHint({ centers, targetId, viewport, view, hidden, onDismiss }) {
   const bouncedRef = useRef(false)
   const hintRef = useRef(null)
+  const [hintElement, setHintElement] = useState(null)
   const [appeared, setAppeared] = useState(false)
+  const attachHint = useCallback((hint) => {
+    hintRef.current = hint
+    setHintElement(hint)
+  }, [])
+
+  useEffect(() => {
+    if (!hintElement || hidden || bouncedRef.current) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.intersectionRatio < 0.75 || bouncedRef.current) return
+      observer.disconnect()
+      bouncedRef.current = true
+      setAppeared(true)
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      hintElement.animate([
+        { transform: 'translateY(0)' },
+        { transform: 'translateY(-7px)', offset: 0.35 },
+        { transform: 'translateY(2px)', offset: 0.65 },
+        { transform: 'translateY(0)' },
+      ], { duration: 650, easing: 'ease-out' })
+    }, { threshold: 0.75 })
+    observer.observe(hintElement.querySelector('.return-hint-bubble'))
+    return () => observer.disconnect()
+  }, [hintElement, hidden])
 
   useEffect(() => {
     if (!appeared) return
@@ -64,37 +88,40 @@ export default function LineageReturnHint({ centers, targetId, viewport, view, h
     x: clamp(target.x - width / 2, 12, viewport.width - width - 12),
     y: top, width, height, side: 'above',
   })
+  // A short horizontal tree leaves space after its row. Point around the blooms.
+  const after = Math.max(...visible.map((point) => point.x + radius)) + 20
+  const afterWidth = Math.min(140, viewport.width - after - 12)
+  if (afterWidth >= 112) candidates.push({
+    x: after, y: clamp(target.y - 34, 8, viewport.height - 76),
+    width: afterWidth, height: 68, side: 'after-row',
+  })
   const card = within && candidates.find(free)
   if (!card) return null
 
   const from = card.side === 'above'
     ? { x: card.x + 16, y: card.y + card.height }
-    : { x: card.side === 'left' ? card.x + card.width : card.x, y: card.y + card.height / 2 }
-  const to = { x: target.x + (card.side === 'right' ? radius + 5 : -radius - 5), y: target.y }
+    : { x: card.side === 'left' ? card.x + card.width : card.x,
+      y: card.y + (card.side === 'after-row' ? 12 : card.height / 2) }
+  const to = card.side === 'after-row'
+    ? { x: target.x, y: target.y - radius - 5 }
+    : { x: target.x + (card.side === 'right' ? radius + 5 : -radius - 5), y: target.y }
+  const bend = Math.max(6, to.y - 24)
   const path = card.side === 'above'
     ? `M ${from.x} ${from.y} C ${from.x} ${to.y}, ${to.x - 24} ${to.y}, ${to.x} ${to.y}`
-    : `M ${from.x} ${from.y} Q ${(from.x + to.x) / 2} ${to.y}, ${to.x} ${to.y}`
+    : card.side === 'after-row'
+      ? `M ${from.x} ${from.y} C ${from.x} ${bend}, ${to.x} ${bend}, ${to.x} ${to.y}`
+      : `M ${from.x} ${from.y} Q ${(from.x + to.x) / 2} ${to.y}, ${to.x} ${to.y}`
   const direction = card.side === 'right' ? 1 : -1
 
   return (
     <div className={`lineage-return-hint${hidden ? ' cue-hidden' : ''}`}
       style={{ transformOrigin: `${card.x + card.width / 2}px ${card.y + card.height / 2}px` }}
-      ref={(hint) => {
-        hintRef.current = hint
-        if (!hint || hidden || bouncedRef.current) return
-        bouncedRef.current = true
-        setAppeared(true)
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-        hint.animate([
-          { transform: 'translateY(0)' },
-          { transform: 'translateY(-7px)', offset: 0.35 },
-          { transform: 'translateY(2px)', offset: 0.65 },
-          { transform: 'translateY(0)' },
-        ], { duration: 650, easing: 'ease-out' })
-      }}>
+      ref={attachHint}>
       <svg className="return-hint-pointer" width={viewport.width} height={viewport.height} aria-hidden="true">
         <path d={path} />
-        <path d={`M ${to.x + direction * 5} ${to.y - 4} L ${to.x} ${to.y} L ${to.x + direction * 5} ${to.y + 4}`} />
+        <path d={card.side === 'after-row'
+          ? `M ${to.x - 4} ${to.y - 5} L ${to.x} ${to.y} L ${to.x + 4} ${to.y - 5}`
+          : `M ${to.x + direction * 5} ${to.y - 4} L ${to.x} ${to.y} L ${to.x + direction * 5} ${to.y + 4}`} />
       </svg>
       <p className="return-hint-bubble" role="note"
         style={{ left: card.x, top: card.y, width: card.width, height: card.height }}>

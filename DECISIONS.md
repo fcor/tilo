@@ -126,3 +126,8 @@ Each entry: **what** we decided, **why**, and anything left **open**.
 **Why:** the user prefers brief guidance with a playful exit rather than a hint that stays until returning.
 **Motion:** reduced-motion users get a short fade without the bounce or shrink. Panning, zooming and hover do not restart the timer.
 **Refinement:** the bubble and arrow now share one animation on their container for both entrance and exit, scaling around the bubble’s center so the pointer stays attached throughout.
+
+### 2026-10-24 · Mobile blooms first and horizontal lineage
+**What:** on mobile (720px wide or less), place the lineage below the blooms in the scrolling page, as confirmed by the user. Grow from left to right, with other branches and roots in separate rows. Desktop retains upward growth in the left sidebar.
+**Behavior:** use the same saved nodes, stems and navigation in both orientations. Resizing across the breakpoint frames the current bloom at a readable scale without changing the garden. Horizontal auto-framing starts from the left and follows new growth; Fit shows the overview and Find centers the current bloom.
+**Return cue:** route the pointer around a short horizontal row. Start the one-time hint’s animation and 3.5-second countdown when its bubble is actually on screen, so guidance does not expire before the user scrolls to it.
