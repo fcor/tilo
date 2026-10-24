@@ -115,3 +115,14 @@ Each entry: **what** we decided, **why**, and anything left **open**.
 **Feature request:** explore a richer curve composition with additional elements. The current open/layered variants form four starting options but only two main visual vocabularies. The new elements and composition rules still need discussion.
 **Confirmed:** remove visible Parent/Seedlings headings, retaining named regions and generation information for screen readers. Use zoom/pan with Fit tree and Find current bloom. Automatic fitting stops at a readable thumbnail scale; explicit Fit can show the full overview. Dragging a thumbnail pans without selecting it, and keyboard focus brings off-screen nodes into view.
 **Open:** lineage background color; comparisons prepared for bright yellow, pale buttery yellow and warm white. The richer curve composition remains a separate study proposal.
+
+### 2026-10-24 · Invite returning to earlier blooms
+**What:** retain the current sunny yellow (`#FFDD33`) lineage background. Add the approved combination of a one-time rounded pink hint (“Click an earlier bloom to return”) and a hover/focus invitation on previous blooms: a slight lift, pink outline and “Go back here” tooltip.
+**Behavior:** the hint points to an earlier bloom without covering the thumbnails, follows the map camera, and disappears after the first return in the garden session. Escape dismisses it and the tooltip. The current bloom keeps its own marker. Dragging still pans without restoring a bloom. Reduced-motion settings disable the hint bounce and hover lift; the artwork remains static.
+**Why:** make returning discoverable without permanently filling the tree with labels or badges.
+
+### 2026-10-24 · Playful automatic hint dismissal
+**What:** the return hint starts its exit 3.5 seconds after first appearing: a small upward bounce and overshoot, then a shrink and fade over 450ms. The pointer fades with it. It remains a one-time hint in the garden session; returning or pressing Escape can dismiss it sooner. Hover and keyboard cues remain available.
+**Why:** the user prefers brief guidance with a playful exit rather than a hint that stays until returning.
+**Motion:** reduced-motion users get a short fade without the bounce or shrink. Panning, zooming and hover do not restart the timer.
+**Refinement:** the bubble and arrow now share one animation on their container for both entrance and exit, scaling around the bubble’s center so the pointer stays attached throughout.

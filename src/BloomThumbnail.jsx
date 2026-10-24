@@ -48,7 +48,7 @@ function bloomImage(seed, renderer) {
 
 // A still image of a bloom, for places that show many of them (the lineage tree).
 export default function BloomThumbnail({
-  seed, onClick, className = '', renderer = drawBloom, label, current = false,
+  seed, onClick, className = '', renderer = drawBloom, label, current = false, descriptionId,
 }) {
   const [src, setSrc] = useState(null)
 
@@ -68,6 +68,7 @@ export default function BloomThumbnail({
       className={['bloom-canvas', onClick && 'clickable', className].filter(Boolean).join(' ')}
       type={onClick ? 'button' : undefined}
       aria-label={label ?? (onClick ? 'Return to this bloom' : undefined)}
+      aria-describedby={descriptionId}
       aria-current={current ? 'step' : undefined}
       role={!onClick && label ? 'img' : undefined}
       onClick={onClick}

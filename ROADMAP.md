@@ -74,7 +74,8 @@ All of these except "Start over" depend on the bloom rework above.
 ## Later
 
 - [x] **Lineage navigation:** drag/wheel panning, pointer-centered zoom, keyboard navigation, bounded automatic fitting, Fit tree and Find current bloom. Explicit Fit offers the full overview; Find restores readable scale. No visible scrollbars. Branch collapsing remains a possible later addition.
-- [ ] **Lineage color:** comparison prepared for current bright yellow, pale buttery yellow and warm white; awaiting the user’s choice.
+- [x] **Lineage color:** retain the current sunny yellow (`#FFDD33`) after reviewing the alternatives.
+- [x] **Return invitation:** a one-time pink hint points to an earlier bloom and bounces, shrinks and fades away after 3.5 seconds (or dismisses sooner on return/Escape). Earlier blooms lift, gain a pink outline and show “Go back here” on hover or keyboard focus.
 - [ ] **Identity:** a real logo (the header has a simple "✿ tilo" wordmark and favicon for now), credits (Compton & Mateas, *Casual Creators*, ICCC 2015; Funky Ikebana as the closest precedent; Chrome Music Lab as the interface reference) and an about panel.
 - [ ] **Saving and export:** SVG of a bloom; save and load a whole lineage as JSON. (PNG is done.)
 - [ ] **Tree polish:** blooms are drawn small inside the tree's white circles and read as dots; draw them larger so the tree is easier to scan.

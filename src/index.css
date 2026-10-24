@@ -1,6 +1,7 @@
 /* After Chrome Music Lab: a white page with hairline grid lines, color only in
    solid blocks (the yellow tree bed) and pink for actions and "you are here", big
-   round buttons that bounce, and hover shown by motion and a light tint, never by a border. */
+   round buttons that bounce, and hover shown by motion and a light tint.
+   Earlier lineage blooms also get a pink outline to invite returning. */
 :root {
   --yellow: #ffdd33; /* a sunnier take on the brand #d9d600, which reads lime and looks muddy on pink */
   --pink: #e6215b;
@@ -84,7 +85,7 @@ body {
   background: var(--yellow);
 }
 
-/* Auto margins push a small tree to the bottom center without hiding overflow. */
+/* The map camera keeps a small tree near the bottom center. */
 .tree {
   position: relative;
   flex: none;
@@ -116,6 +117,8 @@ body {
   transform: translate(-50%, -50%);
 }
 
+.tree-node.previewed { z-index: 1; }
+
 /* Blooms in the tree are white circles. */
 .lineage .bloom-canvas {
   border-radius: 50%;
@@ -126,6 +129,22 @@ body {
   box-shadow: 0 0 0 4px var(--pink);
 }
 
+.lineage .bloom-canvas.clickable {
+  transition: transform 0.3s var(--spring), box-shadow 0.2s;
+}
+
+.lineage .bloom-canvas.clickable:not(.current):hover,
+.lineage .bloom-canvas.clickable:not(.current):focus-visible {
+  background: var(--white);
+  box-shadow: 0 0 0 2px var(--pink);
+  transform: translateY(-3px);
+}
+
+.lineage .bloom-canvas.clickable:not(.current):focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 3px;
+}
+
 /* Blooms off the path to the current one: kept, dimmed, still clickable. Only the
    bloom fades; the white circle stays solid so the stems behind it never show through. */
 .lineage .bloom-canvas.off-stem img {
@@ -133,7 +152,8 @@ body {
   transition: opacity 0.2s;
 }
 
-.lineage .bloom-canvas.off-stem:hover img {
+.lineage .bloom-canvas.off-stem:hover img,
+.lineage .bloom-canvas.off-stem:focus-visible img {
   opacity: 1;
 }
 
@@ -217,6 +237,39 @@ body {
   flex: none;
   height: 56px;
   gap: 8px;
+}
+
+.lineage-return-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.lineage-return-hint.cue-hidden { visibility: hidden; }
+
+.return-hint-pointer {
+  position: absolute;
+  inset: 0;
+  fill: none;
+  stroke: var(--pink-action);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.return-hint-bubble {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--pink-action);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
 }
 
 .icon-button.primary.compact {
@@ -303,6 +356,22 @@ body {
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
+}
+
+.lineage-return-tooltip {
+  bottom: auto;
+  right: auto;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lineage-return-tooltip.visible {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
 }
 
 .action-colors:hover .icon-glyph { transform: rotate(-18deg); }
@@ -464,14 +533,17 @@ body {
   .logo-mark,
   .icon-button,
   .bloom-stage,
-  .action-tooltip {
+  .action-tooltip,
+  .lineage .bloom-canvas.clickable {
     transition: none;
   }
 
   .logo:hover .logo-mark,
   .icon-button:hover,
   .bloom-canvas.clickable:hover .bloom-stage,
-  .bloom-canvas.clickable:active .bloom-stage {
+  .bloom-canvas.clickable:active .bloom-stage,
+  .lineage .bloom-canvas.clickable:not(.current):hover,
+  .lineage .bloom-canvas.clickable:not(.current):focus-visible {
     transform: none;
   }
 

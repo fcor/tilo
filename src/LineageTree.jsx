@@ -1,6 +1,7 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import ActionButton from './ActionButton.jsx'
 import BloomThumbnail from './BloomThumbnail.jsx'
+import LineageReturnHint from './LineageReturnHint.jsx'
 import { generationOf } from './lineage.js'
 import { constrainPan, findBloom, fitTree, layoutTree, MAX_SCALE, READABLE_SCALE, revealBloom, zoomAround } from './treeView.js'
 
@@ -16,6 +17,11 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
   const [viewport, setViewport] = useState({ width: 0, height: 0 })
   const [view, setView] = useState({ x: 0, y: 0, k: 1 })
   const [dragging, setDragging] = useState(false)
+  const [hintDismissed, setHintDismissed] = useState(false)
+  const dismissHint = useCallback(() => setHintDismissed(true), [])
+  const [hoveredId, setHoveredId] = useState(null)
+  const [focusedId, setFocusedId] = useState(null)
+  const [tooltipDismissed, setTooltipDismissed] = useState(false)
   const viewportRef = useRef(null)
   const viewRef = useRef(view)
   const sceneRef = useRef(null)
@@ -23,7 +29,21 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
   const dragRef = useRef(null)
   const draggedRef = useRef(false)
   const clickTimerRef = useRef(null)
+  const hoverTimerRef = useRef(null)
   const helpId = useId()
+  const tooltipId = useId()
+  const previewId = hoveredId ?? focusedId
+  const previousId = nodes[currentId]?.parentId ?? nodes.find((node) => node.id !== currentId)?.id
+  const preview = layout.centers[previewId]
+  const previewX = preview && preview.x * view.k + view.x
+  const previewY = preview && preview.y * view.k + view.y
+  const showTooltip = preview && previewId !== currentId && !tooltipDismissed && !dragging &&
+    previewX >= 0 && previewX <= viewport.width && previewY >= 0 && previewY <= viewport.height
+  const tooltipWidth = 104, tooltipHeight = 34
+  const tooltipX = preview && Math.max(8, Math.min(viewport.width - tooltipWidth - 8,
+    previewX - tooltipWidth / 2))
+  const tooltipY = preview && Math.max(8, Math.min(viewport.height - tooltipHeight - 8,
+    previewY - 24 * view.k - tooltipHeight - 10))
   viewRef.current = view
 
   useEffect(() => {
@@ -31,8 +51,23 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
       setViewport({ width: entry.contentRect.width, height: entry.contentRect.height })
     })
     observer.observe(viewportRef.current)
-    return () => { observer.disconnect(); clearTimeout(clickTimerRef.current) }
+    return () => {
+      observer.disconnect()
+      clearTimeout(clickTimerRef.current)
+      clearTimeout(hoverTimerRef.current)
+    }
   }, [])
+
+  useEffect(() => {
+    const dismiss = (event) => {
+      if (event.key === 'Escape') {
+        if (previousId !== undefined) setHintDismissed(true)
+        setTooltipDismissed(true)
+      }
+    }
+    document.addEventListener('keydown', dismiss)
+    return () => document.removeEventListener('keydown', dismiss)
+  }, [previousId])
 
   useEffect(() => {
     const previous = sceneRef.current
@@ -101,6 +136,7 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
 
   function pointerDown(event) {
     if (event.button !== 0 || !event.isPrimary) return
+    setTooltipDismissed(true)
     dragRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, view: viewRef.current, active: false }
     draggedRef.current = false
   }
@@ -148,6 +184,17 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
     }
   }
 
+  function hover(id) {
+    clearTimeout(hoverTimerRef.current)
+    setHoveredId(id)
+    setTooltipDismissed(false)
+  }
+
+  function leave() {
+    clearTimeout(hoverTimerRef.current)
+    hoverTimerRef.current = setTimeout(() => setHoveredId(null), 150)
+  }
+
   return (
     <>
       <div className={`lineage-view${dragging ? ' dragging' : ''}`} ref={viewportRef}
@@ -159,7 +206,8 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
         onKeyDown={keyDown} onClickCapture={(event) => {
           if (draggedRef.current) { event.preventDefault(); event.stopPropagation() }
         }}>
-        <p className="garden-live" id={helpId}>Drag or scroll to pan. Control or Command plus scroll zooms.
+        <p className="garden-live" id={helpId}>Click a previous bloom to return with its saved seedlings.
+          Drag or scroll to pan. Control or Command plus scroll zooms.
           When the map is focused, arrow keys pan, plus and minus zoom, zero fits the tree, and F finds the current bloom.</p>
         <div className="tree" style={{ width: layout.width, height: layout.height,
           transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})` }}>
@@ -176,20 +224,41 @@ export default function LineageTree({ nodes, currentId, onSelect }) {
             const isCurrent = node.id === currentId
             const center = layout.centers[node.id]
             return (
-              <div key={node.id} className="tree-node" style={{ left: center.x, top: center.y }}
+              <div key={node.id} className={`tree-node${node.id === previewId ? ' previewed' : ''}`}
+                style={{ left: center.x, top: center.y }}
+                onPointerEnter={(event) => { if (event.pointerType !== 'touch') hover(node.id) }}
+                onPointerLeave={leave}
+                onBlurCapture={() => setFocusedId(null)}
                 onFocusCapture={(event) => {
                   if (!event.target.matches(':focus-visible')) return
+                  setFocusedId(node.id)
+                  setTooltipDismissed(false)
                   modeRef.current = 'manual'
                   setView((old) => constrainPan(findBloom(center, viewport, old), layout, viewport))
                 }}>
                 <BloomThumbnail seed={node.seed} current={isCurrent}
+                  descriptionId={isCurrent ? undefined : tooltipId}
                   label={`${isCurrent ? 'Current bloom' : 'Return to bloom'} ${node.id + 1}, generation ${generationOf(nodes, node.id)}`}
                   className={isCurrent ? 'current' : stem.has(node.id) ? '' : 'off-stem'}
-                  onClick={() => onSelect(node.id)} />
+                  onClick={() => {
+                    if (!isCurrent) setHintDismissed(true)
+                    setTooltipDismissed(true)
+                    onSelect(node.id)
+                  }} />
               </div>
             )
           })}
         </div>
+        {!hintDismissed && previousId !== undefined && (
+          <LineageReturnHint centers={layout.centers} targetId={previousId}
+            viewport={viewport} view={view} hidden={dragging || showTooltip} onDismiss={dismissHint} />
+        )}
+        <span className={`action-tooltip lineage-return-tooltip${showTooltip ? ' visible' : ''}`}
+          id={tooltipId} role="tooltip"
+          style={{ left: tooltipX, top: tooltipY, width: tooltipWidth, height: tooltipHeight }}
+          onPointerEnter={() => clearTimeout(hoverTimerRef.current)} onPointerLeave={leave}>
+          Go back here
+        </span>
       </div>
       <div className="lineage-controls" role="group" aria-label="Lineage navigation">
         <ActionButton action="zoomOut" compact onClick={() => zoom(1 / 1.25)} disabled={view.k <= 0.01} />
